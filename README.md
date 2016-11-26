@@ -29,8 +29,8 @@ Don't forget to renew regulary Let's Encrypt certificates. [https://certbot.eff.
 
 # Usage
 
-	./generate [host] [proxy url]
+	./generate.sh [host] [proxy url]
 
 Example
 
-	./generate foo.bar.com http://bar.foo.com
+	./generate.sh foo.bar.com http://bar.foo.com:81
