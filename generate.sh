@@ -94,9 +94,9 @@ echo "            alias /var/www/$host/.well-known;" >>$https
 echo "    }" >>$https
 echo "    location / {" >>$https
 echo "        proxy_pass  $proxy;" >>$https
-echo "        proxy_set_header X-Real-IP  $$remote_addr;" >>$https
-echo "        proxy_set_header X-Forwarded-For $$remote_addr;" >>$https
-echo "        proxy_set_header Host $$host;" >>$https
+echo "        proxy_set_header X-Real-IP  \$remote_addr;" >>$https
+echo "        proxy_set_header X-Forwarded-For \$remote_addr;" >>$https
+echo "        proxy_set_header Host \$host;" >>$https
 echo "    }" >>$https
 echo "}" >>$https
 echo done
