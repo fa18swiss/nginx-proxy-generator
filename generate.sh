@@ -97,6 +97,7 @@ echo "        proxy_pass  $proxy;" >>$https
 echo "        proxy_set_header X-Real-IP  \$remote_addr;" >>$https
 echo "        proxy_set_header X-Forwarded-For \$remote_addr;" >>$https
 echo "        proxy_set_header Host \$host;" >>$https
+echo "        proxy_set_header X-Forwarded-Proto \$scheme;" >>$https
 echo "    }" >>$https
 echo "}" >>$https
 echo done
