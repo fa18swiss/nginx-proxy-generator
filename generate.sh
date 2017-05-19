@@ -31,14 +31,17 @@ https=/etc/nginx/sites-available/https.$host
 ehttps=/etc/nginx/sites-enabled/https.$host
 dhparam=/etc/nginx/dhparam.pem
 
-echo www folder : $www
-echo http sites-available : $http
-echo http sites-enabled : $ehttp
-echo https sites-available : $https
-echo https sites-enabled : $ehttp
-echo dhparam : $dhparam
 
-echo "Warning, this script will reload multiple times nginx, use Ctrl-C now to cancel script"
+cat <<EOF
+www folder : $www
+http sites-available : $http
+http sites-enabled : $ehttp
+https sites-available : $https
+https sites-enabled : $ehttp
+dhparam : $dhparam
+
+Warning, this script will reload multiple times nginx, use Ctrl-C now to cancel script
+EOF
 pause
 
 echo creating www folder $www
@@ -64,42 +67,47 @@ fi
 
 
 echo creating $http
-echo "server {" >$http
-echo "    listen 80;" >>$http
-echo "    listen [::]:80;" >>$http
-echo "    server_name $host;" >>$http
-echo "    location /.well-known {" >>$http
-echo "            alias /var/www/$host/.well-known;" >>$http
-echo "    }" >>$http
-echo "    location / {" >>$http
-echo "        return 301 https://$host;" >>$http
-echo "    }" >>$http
-echo "}" >>$http
+
+cat <<EOF > $http
+server {" >$http
+    listen 80;" >>$http
+    listen [::]:80;" >>$http
+    server_name $host;" >>$http
+    location /.well-known {" >>$http
+            alias /var/www/$host/.well-known;" >>$http
+    }" >>$http
+    location / {" >>$http
+        return 301 https://$host;" >>$http
+    }" >>$http
+}" >>$http
 echo done
+EOF
 
 echo creating $https
-echo "server {" >$https
-echo "    listen 443 ssl;" >>$https
-echo "    listen [::]:443 ssl;" >>$https
-echo "    server_name $host;" >>$https
-echo "    ssl_certificate /etc/letsencrypt/live/$host/fullchain.pem;" >>$https
-echo "    ssl_certificate_key /etc/letsencrypt/live/$host/privkey.pem;" >>$https
-echo "    ssl_stapling on;" >>$https
-echo "    ssl_stapling_verify on;" >>$https
-echo "    ssl_dhparam $dhparam;" >>$https
-echo "    ssl_protocols TLSv1.2;" >>$https
-echo "    add_header Strict-Transport-Security max-age=31536000;" >>$https
-echo "    location /.well-known {" >>$https
-echo "            alias /var/www/$host/.well-known;" >>$https
-echo "    }" >>$https
-echo "    location / {" >>$https
-echo "        proxy_pass  $proxy;" >>$https
-echo "        proxy_set_header X-Real-IP  \$remote_addr;" >>$https
-echo "        proxy_set_header X-Forwarded-For \$remote_addr;" >>$https
-echo "        proxy_set_header Host \$host;" >>$https
-echo "        proxy_set_header X-Forwarded-Proto \$scheme;" >>$https
-echo "    }" >>$https
-echo "}" >>$https
+cat <<EOF > $https
+server {" >$https
+    listen 443 ssl;" >>$https
+    listen [::]:443 ssl;" >>$https
+    server_name $host;" >>$https
+    ssl_certificate /etc/letsencrypt/live/$host/fullchain.pem;" >>$https
+    ssl_certificate_key /etc/letsencrypt/live/$host/privkey.pem;" >>$https
+    ssl_stapling on;" >>$https
+    ssl_stapling_verify on;" >>$https
+    ssl_dhparam $dhparam;" >>$https
+    ssl_protocols TLSv1.2;" >>$https
+    add_header Strict-Transport-Security max-age=31536000;" >>$https
+    location /.well-known {" >>$https
+            alias /var/www/$host/.well-known;" >>$https
+    }" >>$https
+    location / {" >>$https
+        proxy_pass  $proxy;" >>$https
+        proxy_set_header X-Real-IP  \$remote_addr;" >>$https
+        proxy_set_header X-Forwarded-For \$remote_addr;" >>$https
+        proxy_set_header Host \$host;" >>$https
+        proxy_set_header X-Forwarded-Proto \$scheme;" >>$https
+    }" >>$https
+}" >>$https
+EOF
 echo done
 
 echo activating http website
