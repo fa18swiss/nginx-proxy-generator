@@ -69,44 +69,44 @@ fi
 echo creating $http
 
 cat <<EOF > $http
-server {" >$http
-    listen 80;" >>$http
-    listen [::]:80;" >>$http
-    server_name $host;" >>$http
-    location /.well-known {" >>$http
-            alias /var/www/$host/.well-known;" >>$http
-    }" >>$http
-    location / {" >>$http
-        return 301 https://$host;" >>$http
-    }" >>$http
-}" >>$http
-echo done
+server { 
+    listen 80; 
+    listen [::]:80; 
+    server_name $host; 
+    location /.well-known { 
+            alias /var/www/$host/.well-known; 
+    } 
+    location / { 
+        return 301 https://$host; 
+    } 
+} 
 EOF
+echo done
 
 echo creating $https
 cat <<EOF > $https
-server {" >$https
-    listen 443 ssl;" >>$https
-    listen [::]:443 ssl;" >>$https
-    server_name $host;" >>$https
-    ssl_certificate /etc/letsencrypt/live/$host/fullchain.pem;" >>$https
-    ssl_certificate_key /etc/letsencrypt/live/$host/privkey.pem;" >>$https
-    ssl_stapling on;" >>$https
-    ssl_stapling_verify on;" >>$https
-    ssl_dhparam $dhparam;" >>$https
-    ssl_protocols TLSv1.2;" >>$https
-    add_header Strict-Transport-Security max-age=31536000;" >>$https
-    location /.well-known {" >>$https
-            alias /var/www/$host/.well-known;" >>$https
-    }" >>$https
-    location / {" >>$https
-        proxy_pass  $proxy;" >>$https
-        proxy_set_header X-Real-IP  \$remote_addr;" >>$https
-        proxy_set_header X-Forwarded-For \$remote_addr;" >>$https
-        proxy_set_header Host \$host;" >>$https
-        proxy_set_header X-Forwarded-Proto \$scheme;" >>$https
-    }" >>$https
-}" >>$https
+server {
+    listen 443 ssl; 
+    listen [::]:443 ssl; 
+    server_name $host; 
+    ssl_certificate /etc/letsencrypt/live/$host/fullchain.pem; 
+    ssl_certificate_key /etc/letsencrypt/live/$host/privkey.pem; 
+    ssl_stapling on; 
+    ssl_stapling_verify on; 
+    ssl_dhparam $dhparam; 
+    ssl_protocols TLSv1.2; 
+    add_header Strict-Transport-Security max-age=31536000; 
+    location /.well-known { 
+            alias /var/www/$host/.well-known; 
+    } 
+    location / { 
+        proxy_pass  $proxy; 
+        proxy_set_header X-Real-IP  \$remote_addr; 
+        proxy_set_header X-Forwarded-For \$remote_addr; 
+        proxy_set_header Host \$host; 
+        proxy_set_header X-Forwarded-Proto \$scheme; 
+    } 
+} 
 EOF
 echo done
 
