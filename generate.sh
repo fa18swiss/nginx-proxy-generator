@@ -1,5 +1,10 @@
 #!/bin/bash
 
+if [ "$(id -u)" != "0" ]; then
+   echo "This script must be run as root" 1>&2
+   exit 1
+fi
+
 function help {
    echo "Usage : ./generate.sh [host] [proxy url]"
    echo "Example : ./generate.sh foo.bar.com http://bar.foo.com:81"

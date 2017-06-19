@@ -2,7 +2,14 @@
 
 ## Disclamer
 
-This tools has been only tested on debian 8 and nginx 1.6.2. Other version have not been tested.
+This tools has been only tested on :
+
+- Debian 8 with nginx 1.6.2.
+- Ubuntu 16.04 with nginx 1.10.3
+
+Other version have not been tested.
+
+On first run, this tool create a DH key of 4096 bits for [perfect forward secrecy](https://en.wikipedia.org/wiki/Forward_secrecy), that can take a long time.
 
 # Prerequies
 
