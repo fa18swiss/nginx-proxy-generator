@@ -1,7 +1,7 @@
 #!/bin/bash
 
 function help {
-   echo "Usage : ./generate.sh [host] [proxy url]"
+   echo "Usage : ./generate.sh [host] [proxy url] [-s (use the staging version to test network)]"
    echo "Example : ./generate.sh foo.bar.com http://bar.foo.com:81"
 }
 function pause {
@@ -20,6 +20,13 @@ if [ -z "$2" ]
     echo "No proxy supplied"
     help
     exit
+fi
+
+staging=""
+if [ -n "$3" ]
+  then
+    echo "Using staging environment"
+    staging="--staging"
 fi
 
 host=$1
@@ -118,7 +125,7 @@ echo done
 pause
 
 echo request certificate
-certbot certonly --webroot -w $www -d $host
+certbot certonly $staging --webroot -w $www -d $host
 echo done
 
 echo activating https website
