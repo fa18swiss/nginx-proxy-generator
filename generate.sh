@@ -25,8 +25,15 @@ fi
 staging=""
 if [ -n "$3" ]
   then
-    echo "Using staging environment"
-    staging="--staging"
+    if [ "-s" == "$3" ]
+      then
+        echo "Using staging environment"
+        staging="--staging"
+    else
+        echo "Flag not recognized: $3"
+        help
+        exit
+    fi
 fi
 
 host=$1
