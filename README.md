@@ -4,7 +4,6 @@
 
 This tools has been only tested on :
 
-- Debian 8 with nginx 1.6.2.
 - Ubuntu 16.04 with nginx 1.10.3
 
 Other version have not been tested.
@@ -13,8 +12,8 @@ On first run, this tool create a DH key of 4096 bits for [perfect forward secrec
 
 # Prerequies
 
-- nginx >= 1.6
-- OpenSSL
+- nginx >= 1.10
+- OpenSSL  >= 1.0.2
 - [CertBot](https://certbot.eff.org/)
 
 # Functionnality
@@ -36,8 +35,12 @@ Don't forget to renew regulary Let's Encrypt certificates. [https://certbot.eff.
 
 # Usage
 
-	./generate.sh [host] [proxy url]
+	./generate.sh [host] [proxy url] [-s (use the staging version to test network)]
 
 Example
 
 	./generate.sh foo.bar.com http://bar.foo.com:81
+
+# References :
+
+[moz://a SSL Configuration Generator](https://ssl-config.mozilla.org)
