@@ -49,7 +49,8 @@ ehttp=/etc/nginx/sites-enabled/http.$host
 https=/etc/nginx/sites-available/https.$host
 ehttps=/etc/nginx/sites-enabled/https.$host
 dhparam=/etc/nginx/dhparam.pem
-sslconf=/etc/nginx/conf.d/ssl_session_tickets
+proxyconf=/etc/nginx/proxy_params
+sslconf=/etc/nginx/ssl_params
 
 
 cat <<EOF
@@ -59,6 +60,7 @@ http sites-enabled : $ehttp
 https sites-available : $https
 https sites-enabled : $ehttp
 dhparam : $dhparam
+proxyconf : $proxyconf
 sslconf : $sslconf
 
 Warning, this script will reload multiple times nginx, use Ctrl-C now to cancel script
@@ -85,10 +87,32 @@ else
    echo done
 fi
 
+echo creating or updating proxy configuration
+cat <<EOF > $proxyconf
+proxy_set_header Host \$http_host;
+proxy_set_header X-Real-IP \$remote_addr;
+proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+proxy_set_header X-Forwarded-Proto \$scheme;
+proxy_set_header X-Forwarded-Host \$host;
+
+proxy_read_timeout 300;
+proxy_connect_timeout 300;
+proxy_send_timeout 300;
+EOF
 
 echo creating or updating ssl configuration
 cat <<EOF > $sslconf
 ssl_session_tickets off;
+ssl_session_timeout 1d;
+ssl_session_cache shared:MozSSL:10m;
+ssl_dhparam $dhparam;
+ssl_protocols TLSv1.2 TLSv1.3;
+ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384;
+ssl_prefer_server_ciphers off;
+ssl_stapling on;
+ssl_stapling_verify on;
+
+add_header Strict-Transport-Security max-age=31536000; 
 EOF
 
 
@@ -116,27 +140,15 @@ server {
     listen [::]:443 ssl http2;
     server_name $host;
     ssl_certificate /etc/letsencrypt/live/$host/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/$host/privkey.pem;
-    ssl_session_timeout 1d;
-    ssl_session_cache shared:MozSSL:10m;
-    ssl_dhparam $dhparam;
-    ssl_protocols TLSv1.2;
-    ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384;
-    ssl_prefer_server_ciphers off;
-    ssl_stapling on;
-    ssl_stapling_verify on;    
+    ssl_certificate_key /etc/letsencrypt/live/$host/privkey.pem;    
     ssl_trusted_certificate /etc/letsencrypt/live/$host/chain.pem;
-    add_header Strict-Transport-Security max-age=31536000;
+    include $sslconf;    
     location /.well-known {
             alias /var/www/$host/.well-known;
     }
     location / {
         proxy_pass $proxy;
-        proxy_set_header X-Real-IP \$remote_addr;
-        proxy_set_header X-Forwarded-For \$remote_addr;
-        proxy_set_header X-Forwarded-Host \$host;
-        proxy_set_header Host \$host;
-        proxy_set_header X-Forwarded-Proto \$scheme;
+        include $proxyconf;
     }
 }
 EOF
